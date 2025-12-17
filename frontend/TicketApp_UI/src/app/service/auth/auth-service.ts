@@ -51,10 +51,13 @@ export class AuthService {
 
       error: (error: HttpErrorResponse) => {
         if (error.status === 409) {
+
+          const errBody = error.error as LoginErrorResponse;
+
           const dialogRef = this.dialog.open(Forcelogoutdialogue, {
             width: '420px',
             data: {
-              message: error.error?.message
+              message: errBody.message
             }
           });
 
