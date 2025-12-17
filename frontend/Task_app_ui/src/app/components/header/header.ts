@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
+import { AuthService } from '../../service/auth/auth-service';
 
 @Component({
   selector: 'app-header',
@@ -13,9 +14,10 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class Header {
 
-  constructor() {}
+  constructor(private authService: AuthService){}
 
-  onLogout(){
-
+  ngOnit() {
   }
+
+  onLogout(){}
 }
