@@ -1,0 +1,63 @@
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center">
+  <div class="row w-100 justify-content-center">
+    <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+
+      <div class="card bg-dark border-secondary shadow-lg">
+        <div class="card-body p-4">
+
+          <h4 class="text-center mb-4">Ticket Management Login</h4>
+
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+            <!-- Username -->
+            <mat-form-field
+              appearance="outline"
+              class="w-100 mb-3"
+            >
+              <mat-label>Username</mat-label>
+              <input
+                matInput
+                formControlName="username"
+              />
+
+              @if (username?.touched && username?.invalid) {
+                <mat-error>Username is required</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Password -->
+            <mat-form-field
+              appearance="outline"
+              class="w-100 mb-4"
+            >
+              <mat-label>Password</mat-label>
+              <input
+                matInput
+                type="password"
+                formControlName="password"
+              />
+
+              @if (password?.touched && password?.invalid) {
+                <mat-error>Password is required</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Submit Button -->
+            <div class="d-grid">
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+              >
+                Login
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
