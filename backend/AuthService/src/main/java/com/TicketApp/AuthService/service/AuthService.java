@@ -16,7 +16,6 @@ import com.TicketApp.AuthService.exception.InvalidCredentialsException;
 import com.TicketApp.AuthService.exception.InvalidTokenException;
 import com.TicketApp.AuthService.repositories.AuthTokenRepository;
 import com.TicketApp.AuthService.repositories.UserRepository;
-import com.TicketApp.AuthService.requestVO.RefreshTokenRequest;
 import com.TicketApp.AuthService.requestVO.UserLoginRequest;
 import com.TicketApp.AuthService.responseVO.RefreshTokenResponse;
 import com.TicketApp.AuthService.responseVO.TokenIntrospectionResponse;
@@ -48,7 +47,7 @@ public class AuthService {
 
         if (hasActiveSession && !request.getForceLogin()) {
             throw new ActiveSessionExistsException(
-                    "User already logged in on another device");
+                    "User already logged");
         }
 
         if (request.getForceLogin()) {
