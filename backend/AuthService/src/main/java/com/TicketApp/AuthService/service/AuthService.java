@@ -11,10 +11,14 @@ import org.springframework.stereotype.Service;
 
 import com.TicketApp.AuthService.entities.AuthToken;
 import com.TicketApp.AuthService.entities.User;
+import com.TicketApp.AuthService.exception.ActiveSessionExistsException;
 import com.TicketApp.AuthService.exception.InvalidCredentialsException;
+import com.TicketApp.AuthService.exception.InvalidTokenException;
 import com.TicketApp.AuthService.repositories.AuthTokenRepository;
 import com.TicketApp.AuthService.repositories.UserRepository;
+import com.TicketApp.AuthService.requestVO.RefreshTokenRequest;
 import com.TicketApp.AuthService.requestVO.UserLoginRequest;
+import com.TicketApp.AuthService.responseVO.RefreshTokenResponse;
 import com.TicketApp.AuthService.responseVO.TokenIntrospectionResponse;
 import com.TicketApp.AuthService.responseVO.UserLoginResponse;
 
@@ -40,6 +44,17 @@ public class AuthService {
             throw new InvalidCredentialsException();
         }
 
+        boolean hasActiveSession = authTokenRepository.existsByUsernameAndRevokedFalse(user.getUsername());
+
+        if (hasActiveSession && !request.getForceLogin()) {
+            throw new ActiveSessionExistsException(
+                    "User already logged in on another device");
+        }
+
+        if (request.getForceLogin()) {
+            authTokenRepository.revokeAllActiveTokensForUser(user.getUsername());
+        }
+
         String tokenValue = UUID.randomUUID().toString();
         Instant expiresAt = Instant.now().plus(30, ChronoUnit.MINUTES);
 
@@ -58,8 +73,7 @@ public class AuthService {
 
     public TokenIntrospectionResponse introspect(String tokenValue) {
 
-        Optional<AuthToken> tokenOpt =
-                authTokenRepository.findByTokenAndRevokedFalse(tokenValue);
+        Optional<AuthToken> tokenOpt = authTokenRepository.findByTokenAndRevokedFalse(tokenValue);
 
         if (tokenOpt.isEmpty()) {
             return new TokenIntrospectionResponse(false);
@@ -74,15 +88,47 @@ public class AuthService {
         User user = userRepository.findByUsername(token.getUsername())
                 .orElseThrow();
 
-       Set<String> roles = user.getRoleSet();
+        Set<String> roles = user.getRoleSet();
 
         return new TokenIntrospectionResponse(
                 true,
                 user.getUsername(),
                 token.getExpiresAt(),
-                roles
-        );
+                roles);
     }
 
+    public RefreshTokenResponse refresh(String tokenValue) {
 
+        // 1. Find active token
+        AuthToken oldToken = authTokenRepository
+                .findByTokenAndRevokedFalse(tokenValue)
+                .orElseThrow(() -> new InvalidTokenException("Invalid or revoked token"));
+
+        // 2. Check expiry
+        if (oldToken.getExpiresAt().isBefore(Instant.now())) {
+            throw new InvalidTokenException("Token expired");
+        }
+
+        // 3. Revoke old token (rotation)
+        oldToken.setRevoked(true);
+        authTokenRepository.save(oldToken);
+
+        // 4. Generate new token
+        String newTokenValue = UUID.randomUUID().toString();
+        long expiresInSeconds = 30 * 60; // 30 minutes
+        Instant newExpiresAt = Instant.now().plusSeconds(expiresInSeconds);
+
+        AuthToken newToken = new AuthToken();
+        newToken.setToken(newTokenValue);
+        newToken.setUsername(oldToken.getUsername());
+        newToken.setExpiresAt(newExpiresAt);
+        newToken.setRevoked(false);
+
+        authTokenRepository.save(newToken);
+
+        // 5. Return response
+        return new RefreshTokenResponse(
+                newTokenValue,
+                expiresInSeconds);
+    }
 }

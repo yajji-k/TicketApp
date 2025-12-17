@@ -28,7 +28,8 @@ public class WebSecurityConfig {
                 .requestMatchers(
                     "/login",
                     "/demo",
-                    "/introspect"
+                    "/introspect",
+                    "/refresh"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

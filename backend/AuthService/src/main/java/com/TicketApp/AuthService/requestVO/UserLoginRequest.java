@@ -10,6 +10,8 @@ public class UserLoginRequest {
     @NotBlank(message = "Password is required")
     private String password;
 
+    private boolean forceLogin = false;
+
     public UserLoginRequest() {
     }
 
@@ -27,5 +29,13 @@ public class UserLoginRequest {
     
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean getForceLogin() {
+        return forceLogin;
+    }
+
+    public void setForceLogin(boolean forceLogin) {
+        this.forceLogin = forceLogin;
     }
 }
