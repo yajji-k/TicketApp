@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.TicketApp.AuthService.exception.InvalidTokenException;
-import com.TicketApp.AuthService.requestVO.RefreshTokenRequest;
 import com.TicketApp.AuthService.requestVO.TokenIntrospectionRequest;
 import com.TicketApp.AuthService.requestVO.UserLoginRequest;
 import com.TicketApp.AuthService.responseVO.RefreshTokenResponse;
