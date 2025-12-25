@@ -1,3 +1,3 @@
 export const env = {
-    authms: 'http://localhost:8081'
+    gateway: 'http://localhost:8080'
 }

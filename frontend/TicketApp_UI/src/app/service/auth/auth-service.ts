@@ -3,7 +3,6 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { env } from '../../env/environment';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
-import { error } from 'node:console';
 import { MatDialog } from '@angular/material/dialog';
 import { Forcelogoutdialogue } from '../../components/dialogue/forcelogoutdialogue/forcelogoutdialogue';
 
@@ -26,6 +25,12 @@ export interface LoginErrorResponse {
   timestamp: string;
 }
 
+export interface RefreshTokenResponse {
+  accessToken: string;
+  expiresAt: string;
+  tokenType: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -35,17 +40,20 @@ export class AuthService {
   roles: string[] = [];
   tokenType: string = '';
 
-  private readonly authBaseUrl = env.authms;
+  private readonly authBaseUrl = env.gateway;
 
   constructor(private http: HttpClient, private router: Router, private dialog: MatDialog) { }
 
   public postLogin(body: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.authBaseUrl}/auth/login`, body);
+    return this.http.post<LoginResponse>(`${this.authBaseUrl}/auth-service/login`, body);
   }
 
   public login(payload: LoginRequest): void {
     this.postLogin(payload).subscribe({
-      next: () => {
+      next: (response: LoginResponse) => {
+        this.accessToken = response.accessToken;
+        this.roles = response.roles;
+        this.tokenType = response.tokenType;
         this.router.navigate(['/dashboard']);
       },
 
@@ -69,7 +77,12 @@ export class AuthService {
               };
 
               this.postLogin(forcePayload).subscribe({
-                next: () => this.router.navigate(['/dashboard']),
+                next: (response: LoginResponse) => {
+                  this.accessToken = response.accessToken;
+                  this.roles = response.roles;
+                  this.tokenType = response.tokenType;
+                  this.router.navigate(['/dashboard']);
+                },
                 error: err => console.error('Force login failed', err)
               });
             }
@@ -79,6 +92,24 @@ export class AuthService {
         }
       }
     });
+  }
+
+  refreshToken(): Observable<RefreshTokenResponse> {
+    const token = this.accessToken;
+
+    return this.http.post<RefreshTokenResponse>(
+      `${this.authBaseUrl}/auth-service/refresh`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+  }
+
+  getToken(){
+    return this.accessToken;
   }
 
 }

@@ -1,0 +1,79 @@
+<mat-dialog-content class="dialog-content">
+
+  <mat-card class="ticket-card">
+
+    <mat-card-title class="mb-3">
+      Create Ticket
+    </mat-card-title>
+
+    <mat-card-content class="flex-grow-1">
+      <form
+        class="ticket-form"
+        [formGroup]="ticketForm"
+        (ngSubmit)="onSubmit()"
+      >
+
+        <!-- Title -->
+        <mat-form-field appearance="outline" class="w-100 mb-3">
+          <mat-label>Title</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="title"
+            placeholder="Enter ticket title"
+          />
+
+          @if (ticketForm.get('title')?.touched && ticketForm.get('title')?.hasError('required')) {
+            <mat-error>
+              Title is required
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Description -->
+        <mat-form-field appearance="outline" class="w-100 mb-4">
+          <mat-label>Description</mat-label>
+          <textarea
+            matInput
+            rows="6"
+            formControlName="description"
+            placeholder="Describe your issue"
+          ></textarea>
+
+          @if (ticketForm.get('description')?.touched && ticketForm.get('description')?.hasError('required')) {
+            <mat-error>
+              Description is required
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Spacer -->
+        <div class="flex-spacer"></div>
+
+        <!-- Actions -->
+        <div class="d-flex justify-content-end gap-2">
+          <button
+            mat-stroked-button
+            type="button"
+            color="warn"
+            (click)="ticketForm.reset()"
+          >
+            Reset
+          </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="ticketForm.invalid"
+          >
+            Create Ticket
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+
+  </mat-card>
+
+</mat-dialog-content>

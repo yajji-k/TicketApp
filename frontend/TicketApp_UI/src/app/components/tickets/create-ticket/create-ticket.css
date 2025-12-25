@@ -1,0 +1,28 @@
+/* Dialog root content */
+.dialog-content {
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  display: flex;
+}
+
+/* Card fills dialog */
+.ticket-card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+}
+
+/* Form stretches vertically */
+.ticket-form {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Push buttons to bottom */
+.flex-spacer {
+  flex: 1;
+}
