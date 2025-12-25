@@ -3,5 +3,3 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 *.log
 .env
-
-**/application.yaml
